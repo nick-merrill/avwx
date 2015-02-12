@@ -21,7 +21,7 @@ Check out an example of how you could use this library:
 
 ### METARs
 
-    from avwx.models import Metar, SkyCondition
+    from avwx.models import Metar
 
     # Initializes METAR
     jfk_metar = Metar('KJFK')

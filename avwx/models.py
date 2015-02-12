@@ -13,7 +13,7 @@ def _format(value):
 def get_base_cloud_layer(cloud_layers):
     lowest_layer = None
     for layer in cloud_layers:
-        if layer.coverage not in [SkyCondition.BROKEN, SkyCondition.OVERCAST]:
+        if layer.coverage not in [CloudLayer.BROKEN, CloudLayer.OVERCAST]:
             continue
         if lowest_layer is None:
             lowest_layer = layer
@@ -25,7 +25,7 @@ def get_base_cloud_layer(cloud_layers):
             lowest_layer = layer
     return lowest_layer
 
-class SkyCondition(object):
+class CloudLayer(object):
     CLEAR = 'SKC'
     FEW = 'FEW'
     SCATTERED = 'SCT'
@@ -145,7 +145,7 @@ class Metar(object):
         self.cloud_layers = []
         for cloud_layer_tree in cloud_layers:
             attrs = cloud_layer_tree.attrib
-            cloud_layer = SkyCondition(attrs['sky_cover'], attrs.get('cloud_base_ft_agl'))
+            cloud_layer = CloudLayer(attrs['sky_cover'], attrs.get('cloud_base_ft_agl'))
             self.cloud_layers.append(cloud_layer)
         self.properties.append('cloud_layers')
 
