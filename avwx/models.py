@@ -72,7 +72,7 @@ class Metar(object):
     wind_speed = None
     wind_gust = None
     visibility = None
-    altimiter = None
+    altimeter = None
     cloud_layers = None
     flight_category = None
     wx_string = None
@@ -136,7 +136,7 @@ class Metar(object):
         self._init_with_property('wind_speed_kt', 'wind_speed')
         self._init_with_property('wind_gust_kt', 'wind_gust')
         self._init_with_property('visibility_statute_mi', 'visibility')
-        self._init_with_property('altim_in_hg', 'altimiter')
+        self._init_with_property('altim_in_hg', 'altimeter')
         self._init_with_property('flight_category')
         self.elevation = self.elevation * 3.28084
         self._init_with_property('wx_string')
