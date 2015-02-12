@@ -8,7 +8,10 @@ setup(
     author="Nick Merrill",
     author_email="public@nickmerrill.co",
     license='MIT',
-    packages=[],
+    packages=['avwx'],
+    install_requires=[
+        'python-dateutil',
+    ],
     zip_safe=False,
 )
 
