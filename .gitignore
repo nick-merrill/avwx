@@ -5,3 +5,11 @@ venv
 *.swp
 *mock.xml
 
+dist
+sdist
+build
+eggs
+*.egg-info
+
+.DS_Store
+

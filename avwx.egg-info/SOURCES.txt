@@ -1,9 +1,0 @@
-setup.py
-avwx/__init__.py
-avwx/avwx.py
-avwx.egg-info/PKG-INFO
-avwx.egg-info/SOURCES.txt
-avwx.egg-info/dependency_links.txt
-avwx.egg-info/not-zip-safe
-avwx.egg-info/requires.txt
-avwx.egg-info/top_level.txt
