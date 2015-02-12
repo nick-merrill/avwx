@@ -2,28 +2,50 @@ import urllib2
 import xml.etree.ElementTree as ET
 import datetime
 import dateutil.parser
+import re
 
 BASE_URL = "https://aviationweather.gov/adds/dataserver_current/httpparam"
+
 
 def _format(value):
     if isinstance(value, datetime.datetime):
         return value.strftime('%Y-%m-%d %H:%M %Z')
     return value
 
-def get_base_cloud_layer(cloud_layers):
-    lowest_layer = None
-    for layer in cloud_layers:
-        if layer.coverage not in [CloudLayer.BROKEN, CloudLayer.OVERCAST]:
-            continue
-        if lowest_layer is None:
-            lowest_layer = layer
-            continue
-        if layer.height > lowest_layer.height:
-            continue
-        if layer.height < lowest_layer.height or \
-                lowest_layer.get_coverage_percentage() < layer.get_coverage_percentage():
-            lowest_layer = layer
-    return lowest_layer
+
+class CloudLayerSet(object):
+    cloud_layers = set()
+
+    def __init__(self, cloud_layers=()):
+        """
+        :type cloud_layers: list|set|tuple
+        """
+        self.cloud_layers = set(cloud_layers)
+
+    def add_cloud_layer(self, cloud_layer):
+        """
+        :type cloud_layer: CloudLayer
+        """
+        self.cloud_layers.add(cloud_layer)
+
+    def get_base_cloud_layer(self):
+        lowest_layer = None
+        for layer in self.cloud_layers:
+            if layer.coverage not in [CloudLayer.BROKEN, CloudLayer.OVERCAST]:
+                continue
+            if lowest_layer is None:
+                lowest_layer = layer
+                continue
+            if layer.height > lowest_layer.height:
+                continue
+            if layer.height < lowest_layer.height or \
+                    lowest_layer.get_coverage_percentage() < layer.get_coverage_percentage():
+                lowest_layer = layer
+        return lowest_layer
+
+    def __str__(self):
+        return str(list(self.cloud_layers))
+
 
 class CloudLayer(object):
     CLEAR = 'SKC'
@@ -54,6 +76,7 @@ class CloudLayer(object):
     def __str__(self):
         return "%s %s" % (self.coverage, self.height)
 
+
 class Metar(object):
     metar_tree = None
     properties = []
@@ -82,7 +105,11 @@ class Metar(object):
         self.fake = fake
 
     def get_base_cloud_layer(self):
-        return get_base_cloud_layer(self.cloud_layers)
+        cloud_layers = self.cloud_layers
+        if cloud_layers is None:
+            raise Exception("cloud_layers has not been initialized")
+        assert isinstance(cloud_layers, CloudLayerSet)
+        return cloud_layers.get_base_cloud_layer()
 
     def refresh(self):
         if self.fake is False:
@@ -108,7 +135,7 @@ class Metar(object):
         if subtree is None:
             return
         val = subtree.text
-        if 'time' in model_prop:
+        if re.search(r'\btime\b', model_prop) is not None:
             val = dateutil.parser.parse(val)
         else:
             try:
@@ -142,11 +169,11 @@ class Metar(object):
         self._init_with_property('wx_string')
 
         cloud_layers = metar_tree.findall('sky_condition')
-        self.cloud_layers = []
+        self.cloud_layers = CloudLayerSet()
         for cloud_layer_tree in cloud_layers:
             attrs = cloud_layer_tree.attrib
             cloud_layer = CloudLayer(attrs['sky_cover'], attrs.get('cloud_base_ft_agl'))
-            self.cloud_layers.append(cloud_layer)
+            self.cloud_layers.add_cloud_layer(cloud_layer)
         self.properties.append('cloud_layers')
 
     def __str__(self):
