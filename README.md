@@ -36,7 +36,7 @@ Check out an example of how you could use this library:
     # attributes you can access.
     print jfk_metar.detail_string()
 
-#### METAR Attributes
+#### `Metar` Attributes
 
 * `raw_text`
 * `station_id` -- e.g. "KJFK"
