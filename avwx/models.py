@@ -129,14 +129,15 @@ class Metar(object):
         self._init_with_property('observation_time')
         self._init_with_property('latitude')
         self._init_with_property('longitude')
+        self._init_with_property('elevation_m', 'elevation')
         self._init_with_property('temp_c', 'temp')
         self._init_with_property('dewpoint_c', 'dewpoint')
         self._init_with_property('wind_dir_degrees', 'wind_dir')
         self._init_with_property('wind_speed_kt', 'wind_speed')
+        self._init_with_property('wind_gust_kt', 'wind_gust')
         self._init_with_property('visibility_statute_mi', 'visibility')
         self._init_with_property('altim_in_hg', 'altimiter')
         self._init_with_property('flight_category')
-        self._init_with_property('elevation_m', 'elevation')
         self.elevation = self.elevation * 3.28084
         self._init_with_property('wx_string')
 
