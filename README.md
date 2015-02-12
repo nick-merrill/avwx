@@ -12,6 +12,11 @@ This library relies upon the
 
 1. `pip install avwx`
 
+## Example
+
+Check out an example of how you could use this library:
+[FlyTime](https://github.com/NicholasMerrill/FlyTime)
+
 ## Usage
 
 ### METARs
