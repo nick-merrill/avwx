@@ -1,5 +1,13 @@
 # AviationWeather (avwx)
 
+## Disclaimer
+
+**This library is in development and should not be relied upon as
+a primary aviation resource.**
+
+This library relies upon the
+[ADDS service](http://www.aviationweather.gov/adds/) by the NOAA.
+
 ## Installation
 
 1. `pip install avwx`
@@ -39,4 +47,9 @@
 * `visibility` (in statute miles)
 * `altimeter` -- altimiter pressure setting (in inches of mercury)
 * `flight_category` -- e.g. VFR, LIFR, etc.
+
+## In the works
+
+1. TAFs
+2. AIRMETs/SIGMETs
 
