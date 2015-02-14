@@ -19,20 +19,22 @@ Check out an example of how you could use this library:
 
 ### Quick Example
 
-    from avwx.models import Metar
+    from avwx.models import MetarSet
 
     # Initializes METAR
-    jfk_metar = Metar('KJFK')
+    jfk_metars = MetarSet('KJFK')
 
     # Grabs METAR data from ADDS service.
-    jfk_metar.refresh()
+    jfk_metars.refresh()
+    
+    latest_jfk_metar = jfk_metars.get_latest()
 
     # Print the raw text of the METAR
-    print jfk_metar.raw_text
+    print latest_jfk_metar.raw_text
 
     # Print an exploded summary of the METAR to see what kinds of
     # attributes you can access.
-    print jfk_metar.detail_string()
+    print latest_jfk_metar.detail_string()
 
 ## Models
 
