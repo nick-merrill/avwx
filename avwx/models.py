@@ -1,5 +1,5 @@
 import urllib2
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 import datetime
 import dateutil.parser
 import re
@@ -7,10 +7,21 @@ import re
 BASE_URL = "https://aviationweather.gov/adds/dataserver_current/httpparam"
 
 
+class AbstractMethodError(Exception):
+    def __init__(self, message=""):
+        Exception(message)
+
+
 def _format(value):
     if isinstance(value, datetime.datetime):
         return value.strftime('%Y-%m-%d %H:%M %Z')
     return value
+
+
+def _xml_text(element):
+    if element is None:
+        return None
+    return element.text
 
 
 class CloudLayerSet(object):
@@ -28,7 +39,11 @@ class CloudLayerSet(object):
         """
         self.cloud_layers.add(cloud_layer)
 
-    def get_base_cloud_layer(self):
+    def get_ceiling_cloud_layer(self):
+        """
+        Returns the lowest layer of broken or overcast clouds.
+        :rtype: CloudLayer|None
+        """
         lowest_layer = None
         for layer in self.cloud_layers:
             if layer.coverage not in [CloudLayer.BROKEN, CloudLayer.OVERCAST]:
@@ -42,6 +57,12 @@ class CloudLayerSet(object):
                     lowest_layer.get_coverage_percentage() < layer.get_coverage_percentage():
                 lowest_layer = layer
         return lowest_layer
+
+    def load_xml(self, cloud_layers_xml):
+        for cloud_layer_tree in cloud_layers_xml:
+            attrs = cloud_layer_tree.attrib
+            cloud_layer = CloudLayer(attrs['sky_cover'], attrs.get('cloud_base_ft_agl'))
+            self.add_cloud_layer(cloud_layer)
 
     def __str__(self):
         return str(list(self.cloud_layers))
@@ -77,61 +98,216 @@ class CloudLayer(object):
         return "%s %s" % (self.coverage, self.height)
 
 
-class Metar(object):
-    metar_tree = None
-    properties = []
-
+class WeatherStation(object):
     station_id = None
-    observation_time = None
-
-    raw_text = None
 
     latitude = None
     longitude = None
     elevation = None
+
+    def __init__(self, station_id):
+        """
+        :type station_id: str
+        """
+        self.station_id = station_id
+
+    def __str__(self):
+        return self.station_id
+
+
+class WeatherReport(object):
+    class Meta:
+        abstract = True
+
+    xml_root_tag = None  # A declarative check to ensure the correct XML is being passed
+
+    properties = set()
+    station = None
+    xml_data = None
+    raw_text = None
+
     temp = None
     dewpoint = None
-    wind_dir = None
-    wind_speed = None
-    wind_gust = None
+    wind = None
     visibility = None
     altimeter = None
     cloud_layers = None
     flight_category = None
     wx_string = None
 
-    def __init__(self, station_id, fake=False):
-        self.station_id = station_id
-        self.fake = fake
+    def __init__(self, xml_data):
+        """
+        :type xml_data: ElementTree.Element
+        """
+        if not isinstance(xml_data, ElementTree.Element):
+            raise Exception("Invalid xml_data encountered: %s" % xml_data)
+        if xml_data.tag != self.xml_root_tag:
+            raise Exception("xml_data root tag should be %s, but is %s" % (self.xml_root_tag, xml_data.tag))
+        self.xml_data = xml_data
+        self.parse_xml_data()
 
-    def get_base_cloud_layer(self):
+    def parse_xml_data(self):
+        """
+        Parses `xml_data` and loads it into object properties.
+        """
+        self.raw_text = self.xml_data.find('raw_text').text
+        self.station = WeatherStation(self.xml_data.find('station_id').text)
+        self.station.latitude = float(self.xml_data.find('latitude').text)
+        self.station.longitude = float(self.xml_data.find('longitude').text)
+        self.station.elevation = float(self.xml_data.find('elevation_m').text) * 3.28084
+
+
+class Wind(object):
+    direction = None
+    speed = None
+    gust = None
+
+    def __init__(self, direction, speed, gust=None):
+        """
+        :type direction: int|str
+        :type speed: int|str
+        :type gust: int|str|None
+        """
+        self.direction = int(direction)
+        self.speed = int(speed)
+        if gust is not None:
+            self.gust = int(gust)
+
+    def __str__(self):
+        ret = "%d@%d" % self.direction, self.speed
+        if self.gust is not None:
+            ret += "-%d" % self.gust
+        return ret
+
+
+class WeatherReportSet(object):
+    class Meta:
+        abstract = True
+
+    station_set = set()
+    report_set = set()
+    xml_data = None
+
+    def __init__(self, station_id_or_station_ids=()):
+        """
+        :type station_id_or_station_ids: str|set|list|tuple
+        :param station_id_or_station_ids: Pass a single station ID string or a list of several.
+        """
+        if isinstance(station_id_or_station_ids, str):
+            station_id_or_station_ids = [station_id_or_station_ids]
+        self.station_set = set(station_id_or_station_ids)
+
+    def get_api_url(self):
+        raise AbstractMethodError("Abstract method must be implemented by subclass")
+
+    @property
+    def station_string(self):
+        """
+        :rtype: str
+        :returns: comma-separated list of station IDs
+        """
+        return ','.join(self.station_set)
+
+    def refresh(self):
+        self.download_data()
+        self.parse_data()
+
+    def download_data(self):
+        """
+        Loads XML data into the `xml_data` attribute.
+        """
+        api_url = self.get_api_url()
+        body = urllib2.urlopen(api_url).read()
+        xml_root = ElementTree.fromstring(body)
+        xml_warnings = xml_root.find('warnings')
+        if len(xml_warnings.attrib) != 0:
+            print "Data warnings found: %s" % xml_warnings.attrib
+        xml_errors = xml_root.find('errors')
+        if len(xml_errors.attrib) != 0:
+            raise Exception("Data errors found: %s" % xml_errors.attrib)
+        self.xml_data = xml_root.find('data')
+
+    def parse_data(self):
+        raise AbstractMethodError("Abstract method must be implemented by subclass")
+
+
+class MetarSet(WeatherReportSet):
+    def get_api_url(self):
+        return "%(base_url)s?dataSource=metars&requestType=retrieve&format=XML&stationString=%(station_string)s&hoursBeforeNow=2" % {
+            'base_url': BASE_URL,
+            'station_string': self.station_string,
+        }
+
+    def parse_data(self):
+        metar_elms = self.xml_data.findall('METAR')
+        for metar_elm in metar_elms:
+            metar = Metar(metar_elm)
+            self.report_set.add(metar)
+
+    def get_latest(self):
+        """
+        :rtype: Metar|None
+        :returns: most recent metar, none if no metars exist
+        """
+        latest = None
+        for metar in self.report_set:
+            if latest is None:
+                latest = metar
+                continue
+            if metar.observation_time < latest.observation_time:
+                latest = metar
+        return latest
+
+
+class Metar(WeatherReport):
+    xml_root_tag = 'METAR'
+
+    observation_time = None
+
+    def __init__(self, xml_data):
+        super(Metar, self).__init__(xml_data)
+
+    def get_api_url(self):
+        return "%(base_url)s?dataSource=metars&requestType=retrieve&format=XML&stationString=%(station_id)s&hoursBeforeNow=2" % {
+            'base_url': BASE_URL,
+            'station_id': self.station.station_id,
+        }
+
+    def parse_xml_data(self):
+        super(Metar, self).parse_xml_data()
+
+        self._init_with_property('observation_time')
+        self._init_with_property('temp_c', 'temp')
+        self._init_with_property('dewpoint_c', 'dewpoint')
+        self.wind = Wind(
+            _xml_text(self.xml_data.find('wind_dir_degrees')),
+            _xml_text(self.xml_data.find('wind_speed_kt')),
+            _xml_text(self.xml_data.find('wind_gust_kt')),
+        )
+        self.properties.add('wind')
+        self._init_with_property('visibility_statute_mi', 'visibility')
+        self._init_with_property('altim_in_hg', 'altimeter')
+        self._init_with_property('flight_category')
+        self._init_with_property('wx_string')
+
+        self.cloud_layers = CloudLayerSet()
+        self.cloud_layers.load_xml(self.xml_data.findall('sky_condition'))
+        self.properties.add('cloud_layers')
+
+    def get_ceiling_cloud_layer(self):
         cloud_layers = self.cloud_layers
         if cloud_layers is None:
             raise Exception("cloud_layers has not been initialized")
         assert isinstance(cloud_layers, CloudLayerSet)
-        return cloud_layers.get_base_cloud_layer()
-
-    def refresh(self):
-        if self.fake is False:
-            body = urllib2.urlopen(
-                "%s?dataSource=metars&requestType=retrieve&format=XML&stationString=%s&hoursBeforeNow=2" %
-                (BASE_URL, self.station_id)
-            ).read()
-            root = ET.fromstring(body)
-        else:
-            root = ET.parse(self.fake)
-        metar = root.find('data').find('METAR')
-        if metar is None:
-            raise Exception("Metar could not be found.")
-        self.init_with_data_from_tree(metar)
+        return cloud_layers.get_ceiling_cloud_layer()
 
     def _init_with_property(self, prop, model_prop=None):
-        tree = self.metar_tree
-        if tree is None:
-            raise Exception("metar_tree must be defined")
+        xml = self.xml_data
+        if xml is None:
+            raise Exception("xml_data must be defined")
         if model_prop is None:
             model_prop = prop
-        subtree = tree.find(prop)
+        subtree = xml.find(prop)
         if subtree is None:
             return
         val = subtree.text
@@ -143,41 +319,10 @@ class Metar(object):
             except ValueError:
                 pass
         setattr(self, model_prop, val)
-        self.properties.append(model_prop)
-
-    def init_with_data_from_tree(self, metar_tree):
-        self.properties = []
-
-        self.metar_tree = metar_tree
-
-        self._init_with_property('raw_text')
-
-        self._init_with_property('station_id')
-        self._init_with_property('observation_time')
-        self._init_with_property('latitude')
-        self._init_with_property('longitude')
-        self._init_with_property('elevation_m', 'elevation')
-        self._init_with_property('temp_c', 'temp')
-        self._init_with_property('dewpoint_c', 'dewpoint')
-        self._init_with_property('wind_dir_degrees', 'wind_dir')
-        self._init_with_property('wind_speed_kt', 'wind_speed')
-        self._init_with_property('wind_gust_kt', 'wind_gust')
-        self._init_with_property('visibility_statute_mi', 'visibility')
-        self._init_with_property('altim_in_hg', 'altimeter')
-        self._init_with_property('flight_category')
-        self.elevation = self.elevation * 3.28084
-        self._init_with_property('wx_string')
-
-        cloud_layers = metar_tree.findall('sky_condition')
-        self.cloud_layers = CloudLayerSet()
-        for cloud_layer_tree in cloud_layers:
-            attrs = cloud_layer_tree.attrib
-            cloud_layer = CloudLayer(attrs['sky_cover'], attrs.get('cloud_base_ft_agl'))
-            self.cloud_layers.add_cloud_layer(cloud_layer)
-        self.properties.append('cloud_layers')
+        self.properties.add(model_prop)
 
     def __str__(self):
-        return self.station_id
+        return str(self.station)
 
     def detail_string(self):
         ret = ""
@@ -187,4 +332,3 @@ class Metar(object):
             val = getattr(self, prop)
             ret += "%s:\t%s" % (prop, _format(val))
         return ret
-

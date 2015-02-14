@@ -12,14 +12,12 @@ This library relies upon the
 
 1. `pip install avwx`
 
-## Example
+## Examples
 
 Check out an example of how you could use this library:
 [FlyTime](https://github.com/NicholasMerrill/FlyTime)
 
-## Usage
-
-### METARs
+### Quick Example
 
     from avwx.models import Metar
 
@@ -36,26 +34,80 @@ Check out an example of how you could use this library:
     # attributes you can access.
     print jfk_metar.detail_string()
 
-#### `Metar` Attributes
+## Models
+
+### `Metar`
+
+#### Attributes
+
+(Based on [ADDS METAR data type](http://www.aviationweather.gov/dataserver/fields?datatype=metar))
 
 * `raw_text`
-* `station_id` -- e.g. "KJFK"
+* `station` -- `WeatherStation` object
 * `observation_time` -- time the METAR was created (Python `datetime` object)
-* `latitude`
-* `longitude`
-* `elevation` -- elevation of reporting station
 * `temp` -- temperature (in Celsius)
 * `dewpoint` (in Celsius)
-* `wind_dir` -- wind direction (in degrees)
-* `wind_speed` -- wind speed (in knots)
-* `wind_gust` -- wind gust speed (in knots)
+* `wind` -- `Wind` object
 * `visibility` (in statute miles)
-* `altimeter` -- altimiter pressure setting (in inches of mercury)
+* `altimeter` -- altimeter pressure setting (in inches of mercury)
 * `flight_category` -- e.g. VFR, LIFR, etc.
+* `cloud_layers` -- `CloudLayerSet` object
+
+### `Taf`
+
+#### Attributes
+
+(Based on [ADDS TAF data type](http://www.aviationweather.gov/dataserver/fields?datatype=taf))
+
+* `raw_text`
+* `station` -- `WeatherStation` object
+* `issue_time`
+* `bulletin_time`
+* `valid_time_from`
+* `valid_time_to`
+* `remarks`
+* `forecast` -- `TafForecast` object
+
+### `TafForecast`
+
+#### Attributes
+
+* `time_from` -- the start of the forecast time
+* `time_to` -- the end time of the forecast
+* `change_indicator` -- one of the following:
+    * `ChangeIndicator.TEMPORARY`
+    * `ChangeIndicator.BECOMING`
+    * `ChangeIndicator.FROM`
+    * `ChangeIndicator.PROBABLE`
+* `time_becoming`
+* `probability` -- percent probability (e.g. 70)
+* `wind` -- `Wind` object
+* `visibility` -- horizontal visibility (in statute miles)
+* `altimeter` (in inches of mercury)
+* `vertical_visibility` (in feet)
+* `wx_string` -- additional weather
+* `not_decoded` -- information that wasn't decoded
+* `cloud_layers` -- `CloudLayerSet` object
+
+### `Wind`
+
+#### Attributes
+
+* `direction` (in degrees)
+* `speed` (in knots)
+* `gust` (in knots)
+
+
+### `WeatherStation`
+
+#### Attributes
+
+* `latitude`
+* `longitude`
+* `elevation` -- elevation of reporting station (in feet)
 
 ## In the works
 
-1. TAFs
-2. AIRMETs/SIGMETs
-3. Testing
+1. AIRMETs / SIGMETs
+2. Testing
 
