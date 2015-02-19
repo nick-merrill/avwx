@@ -15,7 +15,7 @@ This library relies upon the
 ## Examples
 
 Check out an example of how you could use this library:
-[FlyTime](https://github.com/NicholasMerrill/FlyTime)
+[avwxsummarizer](https://github.com/NicholasMerrill/avwxsummarizer)
 
 ### Quick Example
 
