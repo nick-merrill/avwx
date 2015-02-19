@@ -1,5 +1,7 @@
 # AviationWeather (avwx)
 
+[![Build Status](https://travis-ci.org/NicholasMerrill/avwx.svg?branch=master)](https://travis-ci.org/NicholasMerrill/avwx)
+
 ## Disclaimer
 
 **This library is in development and should not be relied upon as
