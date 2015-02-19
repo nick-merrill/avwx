@@ -208,16 +208,19 @@ class WeatherReportSet(object):
         """
         return ','.join(self.station_set)
 
-    def refresh(self):
-        self.download_data()
+    def refresh(self, mock_response=None):
+        self.download_data(mock_response=mock_response)
         self.parse_data()
 
-    def download_data(self):
+    def download_data(self, mock_response=None):
         """
         Loads XML data into the `xml_data` attribute.
         """
-        api_url = self.get_api_url()
-        body = urllib2.urlopen(api_url).read()
+        if mock_response is not None:
+            body = mock_response
+        else:
+            api_url = self.get_api_url()
+            body = urllib2.urlopen(api_url).read()
         xml_root = ElementTree.fromstring(body)
         xml_warnings = xml_root.find('warnings')
         if len(xml_warnings.attrib) != 0:

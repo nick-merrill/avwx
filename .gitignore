@@ -3,12 +3,11 @@ venv
 *.pyc
 *~
 *.swp
-*mock.xml
 
 dist
 sdist
 build
-eggs
+.eggs
 *.egg-info
 
 .DS_Store

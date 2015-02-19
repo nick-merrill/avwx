@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance" version="1.2" xsi:noNamespaceSchemaLocation="http://aviationweather.gov/adds/schema/metar1_2.xsd">
+  <request_index>69031481</request_index>
+  <data_source name="metars" />
+  <request type="retrieve" />
+  <errors />
+  <warnings />
+  <time_taken_ms>3</time_taken_ms>
+  <data num_results="4">
+    <METAR>
+      <raw_text>KBUF 112303Z 24013KT 1SM R23/P6000FT -SN BLSN BKN007 OVC010 M02/M03 A2984 RMK AO2 P0000 T10171033</raw_text>
+      <station_id>KBUF</station_id>
+      <observation_time>2015-02-11T23:03:00Z</observation_time>
+      <latitude>42.93</latitude>
+      <longitude>-78.73</longitude>
+      <temp_c>-1.7</temp_c>
+      <dewpoint_c>-3.3</dewpoint_c>
+      <wind_dir_degrees>240</wind_dir_degrees>
+      <wind_speed_kt>13</wind_speed_kt>
+      <visibility_statute_mi>1.0</visibility_statute_mi>
+      <altim_in_hg>29.840551</altim_in_hg>
+      <quality_control_flags>
+        <auto_station>TRUE</auto_station>
+      </quality_control_flags>
+      <wx_string>-SN BLSN</wx_string>
+      <sky_condition sky_cover="BKN" cloud_base_ft_agl="700" />
+      <sky_condition sky_cover="OVC" cloud_base_ft_agl="1000" />
+      <flight_category>IFR</flight_category>
+      <precip_in>0.0050</precip_in>
+      <metar_type>SPECI</metar_type>
+      <elevation_m>211.0</elevation_m>
+    </METAR>
+    <METAR>
+      <raw_text>KBUF 112254Z 24010KT 1/2SM R23/5000VP6000FT SN BLSN OVC007 M02/M03 A2984 RMK AO2 SNB2158 SLP117 SNINCR 1/21 P0005 T10171033</raw_text>
+      <station_id>KBUF</station_id>
+      <observation_time>2015-02-11T22:54:00Z</observation_time>
+      <latitude>42.93</latitude>
+      <longitude>-78.73</longitude>
+      <temp_c>-1.7</temp_c>
+      <dewpoint_c>-3.3</dewpoint_c>
+      <wind_dir_degrees>240</wind_dir_degrees>
+      <wind_speed_kt>10</wind_speed_kt>
+      <visibility_statute_mi>0.5</visibility_statute_mi>
+      <altim_in_hg>29.840551</altim_in_hg>
+      <sea_level_pressure_mb>1011.7</sea_level_pressure_mb>
+      <quality_control_flags>
+        <auto_station>TRUE</auto_station>
+      </quality_control_flags>
+      <wx_string>SN BLSN</wx_string>
+      <sky_condition sky_cover="OVC" cloud_base_ft_agl="700" />
+      <flight_category>LIFR</flight_category>
+      <precip_in>0.05</precip_in>
+      <snow_in>21.0</snow_in>
+      <metar_type>METAR</metar_type>
+      <elevation_m>211.0</elevation_m>
+    </METAR>
+    <METAR>
+      <raw_text>KBUF 112228Z 24008KT 1/4SM R23/3000V4000FT +SN BLSN FEW004 OVC008 M02/M04 A2984 RMK AO2 SNB2158 P0003 T10221039</raw_text>
+      <station_id>KBUF</station_id>
+      <observation_time>2015-02-11T22:28:00Z</observation_time>
+      <latitude>42.93</latitude>
+      <longitude>-78.73</longitude>
+      <temp_c>-2.2</temp_c>
+      <dewpoint_c>-3.9</dewpoint_c>
+      <wind_dir_degrees>240</wind_dir_degrees>
+      <wind_speed_kt>8</wind_speed_kt>
+      <visibility_statute_mi>0.25</visibility_statute_mi>
+      <altim_in_hg>29.840551</altim_in_hg>
+      <quality_control_flags>
+        <auto_station>TRUE</auto_station>
+      </quality_control_flags>
+      <wx_string>+SN BLSN</wx_string>
+      <sky_condition sky_cover="FEW" cloud_base_ft_agl="400" />
+      <sky_condition sky_cover="OVC" cloud_base_ft_agl="800" />
+      <flight_category>LIFR</flight_category>
+      <precip_in>0.03</precip_in>
+      <metar_type>METAR</metar_type>
+      <elevation_m>211.0</elevation_m>
+    </METAR>
+    <METAR>
+      <raw_text>KBUF 112219Z 23007KT 1/4SM R23/2400V4000FT +SN BLSN VV011 M02/M04 A2983 RMK AO2 SNB2158 P0001 T10221039</raw_text>
+      <station_id>KBUF</station_id>
+      <observation_time>2015-02-11T22:19:00Z</observation_time>
+      <latitude>42.93</latitude>
+      <longitude>-78.73</longitude>
+      <temp_c>-2.2</temp_c>
+      <dewpoint_c>-3.9</dewpoint_c>
+      <wind_dir_degrees>230</wind_dir_degrees>
+      <wind_speed_kt>7</wind_speed_kt>
+      <visibility_statute_mi>0.25</visibility_statute_mi>
+      <altim_in_hg>29.828741</altim_in_hg>
+      <quality_control_flags>
+        <auto_station>TRUE</auto_station>
+      </quality_control_flags>
+      <wx_string>+SN BLSN</wx_string>
+      <sky_condition sky_cover="OVX" cloud_base_ft_agl="0" />
+      <flight_category>LIFR</flight_category>
+      <precip_in>0.01</precip_in>
+      <vert_vis_ft>1100</vert_vis_ft>
+      <metar_type>METAR</metar_type>
+      <elevation_m>211.0</elevation_m>
+    </METAR>
+  </data>
+</response>
+
