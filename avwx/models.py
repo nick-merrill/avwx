@@ -257,6 +257,7 @@ class MetarSet(WeatherReportSet):
             if latest is None:
                 latest = metar
                 continue
+            assert isinstance(metar.observation_time, datetime.datetime)
             if metar.observation_time < latest.observation_time:
                 latest = metar
         return latest
@@ -314,7 +315,7 @@ class Metar(WeatherReport):
         if subtree is None:
             return
         val = subtree.text
-        if re.search(r'\btime\b', model_prop) is not None:
+        if re.search(r'(_|\b)time(_|\b)', model_prop) is not None:
             val = dateutil.parser.parse(val)
         else:
             try:
