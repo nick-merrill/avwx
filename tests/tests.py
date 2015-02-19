@@ -9,16 +9,17 @@ class MetarTests(unittest.TestCase):
     def setUp(self):
         with open('tests/mock_KBUF.xml', 'rU') as f:
             self.mock_response = f.read()
-        self.metar_set = MetarSet('KBUF')
+        self.metar_set = MetarSet('KBUF,KAPA')
         self.metar_set.refresh(mock_response=self.mock_response)
 
     def test_explicit_station_string(self):
-        self.assertEqual(self.metar_set.station_string, "KBUF")
+        self.assertEqual(self.metar_set.station_string, "KBUF,KAPA")
 
     def test_implicit_station_string(self):
         metar_set = MetarSet('wrong')
         metar_set.refresh(mock_response=self.mock_response)
-        self.assertEqual(metar_set.station_string, "KBUF")
+        for metar in metar_set.report_set:
+            self.assertEqual(metar.station.station_id, "KBUF")
 
     def test_get_latest(self):
         latest_metar = self.metar_set.get_latest()
