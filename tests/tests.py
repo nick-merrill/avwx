@@ -1,5 +1,5 @@
 import unittest
-from avwx.models import MetarSet
+from avwx.models import MetarSet, WeatherStation, Wind, CloudLayerSet
 import dateutil.parser
 import datetime
 
@@ -22,14 +22,29 @@ class MetarTests(unittest.TestCase):
             self.assertEqual(metar.station.station_id, "KBUF")
 
     def test_get_latest(self):
+        """
+        Ensures algorithm is getting the Metar with the most recent timestamp.
+        """
         latest_metar = self.metar_set.get_latest()
+        print latest_metar.raw_text
         expected_time = dateutil.parser.parse("2015-02-11T23:03:00Z")
         self.assertEqual(latest_metar.observation_time, expected_time)
 
-    def test_available_attributes(self):
-        metar = self.metar_set.report_set.pop()
+    def _test_metar_attributes(self, metar):
+        self.assertTrue(isinstance(metar.raw_text, (str, unicode)))
+        self.assertTrue(isinstance(metar.flight_category, (str, unicode)))
         self.assertTrue(isinstance(metar.observation_time, datetime.datetime))
+        self.assertTrue(isinstance(metar.station, WeatherStation))
+        self.assertTrue(isinstance(metar.wind, Wind))
+        self.assertTrue(isinstance(metar.cloud_layers, CloudLayerSet))
+        # Floats
+        for key in ['temp', 'dewpoint', 'visibility', 'altimeter']:
+            val = getattr(metar, key)
+            self.assertTrue(isinstance(val, float), "%s should be a float, not a %s" % (key, type(val)))
 
+    def test_available_attributes(self):
+        for metar in self.metar_set.report_set:
+            self._test_metar_attributes(metar)
 
 if __name__ == '__main__':
     unittest.main()

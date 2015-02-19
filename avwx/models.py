@@ -258,7 +258,7 @@ class MetarSet(WeatherReportSet):
                 latest = metar
                 continue
             assert isinstance(metar.observation_time, datetime.datetime)
-            if metar.observation_time < latest.observation_time:
+            if metar.observation_time > latest.observation_time:
                 latest = metar
         return latest
 
