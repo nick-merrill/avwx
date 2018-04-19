@@ -7,7 +7,7 @@ import datetime
 class MetarTests(unittest.TestCase):
 
     def setUp(self):
-        with open('tests/mock_KBUF.xml', 'rU') as f:
+        with open('mock_KBUF.xml', 'r') as f:
             self.mock_response = f.read()
         self.metar_set = MetarSet('KBUF,KAPA')
         self.metar_set.refresh(mock_response=self.mock_response)
@@ -26,13 +26,12 @@ class MetarTests(unittest.TestCase):
         Ensures algorithm is getting the Metar with the most recent timestamp.
         """
         latest_metar = self.metar_set.get_latest()
-        print latest_metar.raw_text
         expected_time = dateutil.parser.parse("2015-02-11T23:03:00Z")
         self.assertEqual(latest_metar.observation_time, expected_time)
 
     def _test_metar_attributes(self, metar):
-        self.assertTrue(isinstance(metar.raw_text, (str, unicode)))
-        self.assertTrue(isinstance(metar.flight_category, (str, unicode)))
+        self.assertTrue(isinstance(metar.raw_text, str))
+        self.assertTrue(isinstance(metar.flight_category, str))
         self.assertTrue(isinstance(metar.observation_time, datetime.datetime))
         self.assertTrue(isinstance(metar.station, WeatherStation))
         self.assertTrue(isinstance(metar.wind, Wind))
@@ -45,6 +44,7 @@ class MetarTests(unittest.TestCase):
     def test_available_attributes(self):
         for metar in self.metar_set.report_set:
             self._test_metar_attributes(metar)
+
 
 if __name__ == '__main__':
     unittest.main()

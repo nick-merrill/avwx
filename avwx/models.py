@@ -1,4 +1,4 @@
-import urllib2
+from urllib.request import urlopen
 from xml.etree import ElementTree
 import datetime
 import dateutil.parser
@@ -220,11 +220,11 @@ class WeatherReportSet(object):
             body = mock_response
         else:
             api_url = self.get_api_url()
-            body = urllib2.urlopen(api_url).read()
+            body = urlopen(api_url).read()
         xml_root = ElementTree.fromstring(body)
         xml_warnings = xml_root.find('warnings')
         if len(xml_warnings.attrib) != 0:
-            print "Data warnings found: %s" % xml_warnings.attrib
+            print("Data warnings found: %s" % xml_warnings.attrib)
         xml_errors = xml_root.find('errors')
         if len(xml_errors.attrib) != 0:
             raise Exception("Data errors found: %s" % xml_errors.attrib)

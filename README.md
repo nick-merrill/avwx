@@ -1,6 +1,6 @@
 # AviationWeather (avwx)
 
-[![Build Status](https://travis-ci.org/NicholasMerrill/avwx.svg?branch=master)](https://travis-ci.org/NicholasMerrill/avwx)
+[![Build Status](https://travis-ci.org/cloudrave/avwx.svg?branch=master)](https://travis-ci.org/cloudrave/avwx)
 
 ## Disclaimer
 
@@ -12,12 +12,14 @@ This library relies upon the
 
 ## Installation
 
+*Note: This library supports only Python 3 as of version 1.0.0.*
+
 1. `pip install avwx`
 
 ## Examples
 
 Check out an example of how you could use this library:
-[avwxsummarizer](https://github.com/NicholasMerrill/avwxsummarizer)
+[avwxsummarizer](https://github.com/cloudrave/avwxsummarizer)
 
 ### Quick Example
 
