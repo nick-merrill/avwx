@@ -1,5 +1,8 @@
 # AviationWeather (avwx)
 
+**Note: `avwx` is no longer being maintained.  Please see Michael duPont's
+package [`avwx-engine`](https://github.com/flyinactor91/AVWX-Engine).**
+
 [![Build Status](https://travis-ci.org/cloudrave/avwx.svg?branch=master)](https://travis-ci.org/cloudrave/avwx)
 
 ## Disclaimer
